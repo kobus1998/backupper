@@ -11,7 +11,7 @@ use std::io::prelude::*;
 pub struct Backup;
 impl Backup {
 
-    pub fn create(name: String, data: String) {
+    pub fn create(name: &String, data: String) {
         let mut file = File::create(name).unwrap();
         file.write_all(data.to_string().as_bytes()).unwrap();
     }
@@ -24,24 +24,22 @@ impl Backup {
         contents
     }
 
-    pub fn copy(start: &Path, dir: String) {
+    pub fn copy(start: &Path, dir: &String) {
         let name = start.file_name().unwrap().to_str().unwrap();
-        let content = Backup::read(start);
-        Backup::create(name.to_string(), content);
+        fs::create_dir_all(str::replace(dir, name, ""));
+        Backup::create(dir, Backup::read(start));
     }
 
     pub fn run_through_directories(start: &Path, end: &Path) {
-        let start_name: String = start.display().to_string();
-        let end_name: String = end.display().to_string();
+        let start_name: &str = start.to_str().unwrap();
+        let end_name: &str = end.to_str().unwrap();
 
         for entry in WalkDir::new(start_name).into_iter().filter_map(|e| e.ok()) {
             let path = entry.path();
-            let name: String = path.file_name().unwrap().to_str().unwrap().to_string();
-            let parent: String = path.parent().unwrap().to_str().unwrap().to_string();
-            
 
             if !path.is_dir() {
-                println!("{}", parent);
+                let path_to = str::replace(path.to_str().unwrap(), start_name, end_name);
+                Backup::copy(path, &path_to.to_string());
             }
         }
     }
