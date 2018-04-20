@@ -3,6 +3,9 @@ name = "backupper"
 version = "0.1.0"
 authors = ["kobus <dev.kobus@gmail.com>"]
 
+[[bin]]
+name = "backupper"
+
 [dependencies]
-termion = "*"
 walkdir = "2"
+termion = "*"
